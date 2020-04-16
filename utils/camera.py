@@ -56,6 +56,9 @@ def add_camera_args(parser):
     parser.add_argument('--height', dest='image_height',
                         help='image height [480]',
                         default=480, type=int)
+    parser.add_argument('--v4l2', dest='use_v4l2',
+                        help='video4linux2 str [/dev/video? xxxxxx]',
+                        default="", type=str) ##samson
     return parser
 
 
@@ -185,6 +188,10 @@ class Camera():
                 args.image_width,
                 args.image_height
             )
+            self.use_thread = True
+        elif args.use_v4l2:
+            self.cap = cv2.VideoCapture(args.use_v4l2)
+			# ignore image width/height settings here
             self.use_thread = True
         else:  # by default, use the jetson onboard camera
             self.cap = open_cam_onboard(

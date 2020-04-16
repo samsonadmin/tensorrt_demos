@@ -10,7 +10,7 @@ import argparse
 
 import cv2
 from utils.camera import add_camera_args, Camera
-from utils.display import open_window, set_display, show_fps
+from utils.display import open_window, set_display, show_fps, show_face_det
 from utils.mtcnn import TrtMtcnn
 
 
@@ -25,6 +25,7 @@ def parse_args():
             'Nano')
     parser = argparse.ArgumentParser(description=desc)
     parser = add_camera_args(parser)
+    #parser.add_argument("-v", "--video", required=True,	help="path to input video file")
     parser.add_argument('--minsize', type=int, default=40,
                         help='minsize (in pixels) for detection [40]')
     args = parser.parse_args()
@@ -43,9 +44,10 @@ def show_faces(img, boxes, landmarks):
 
 def loop_and_detect(cam, mtcnn, minsize):
     """Continuously capture images from camera and do face detection."""
-    full_scrn = False
+    full_scrn = True
     fps = 0.0
     tic = time.time()
+    set_display(WINDOW_NAME, full_scrn)
     while True:
         if cv2.getWindowProperty(WINDOW_NAME, 0) < 0:
             break
@@ -55,6 +57,7 @@ def loop_and_detect(cam, mtcnn, minsize):
             print('{} face(s) found'.format(len(dets)))
             img = show_faces(img, dets, landmarks)
             img = show_fps(img, fps)
+            img = show_face_det(img, dets)
             cv2.imshow(WINDOW_NAME, img)
             toc = time.time()
             curr_fps = 1.0 / (toc - tic)
